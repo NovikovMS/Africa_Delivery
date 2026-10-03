@@ -1,0 +1,42 @@
+@startuml c4-context
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
+
+LAYOUT_TOP_DOWN()
+title Africa Delivery - C4 Context (MVP, 15.10.2026)
+
+Person(buyer, "Покупатель", "Смартфон Android, 3G/4G. Нигерия, Кения")
+Person(ruralBuyer, "Покупатель без интернета", "Кнопочный телефон, USSD и SMS")
+Person(seller, "Продавец", "Малый и средний бизнес. Веб-кабинет или WhatsApp")
+Person(operator, "Оператор бэк-офиса", "Модерация каталога, KYC продавцов, споры")
+Person(exec, "Руководство", "Инвестор, CEO. Дашборд запуска")
+
+System(platform, "Africa Delivery", "Маркетплейс: каталог, заказы, оплата, доставка, уведомления. Модульный монолит (ADR-001)")
+
+System_Ext(mpesa, "M-Pesa", "Мобильные платежи, Кения")
+System_Ext(flutterwave, "Flutterwave", "Карты, переводы, Нигерия и Кения")
+System_Ext(paystack, "Paystack", "Карты и переводы, Нигерия. Резервный провайдер")
+System_Ext(sendbox, "Sendbox", "Курьерская доставка, Нигерия")
+System_Ext(sendy, "Sendy", "Курьерская доставка, Кения")
+System_Ext(whatsapp, "WhatsApp Business API", "Канал продавцов и уведомлений покупателей")
+System_Ext(smsUssd, "SMS/USSD-шлюз", "SMS-уведомления и USSD-сессии")
+System_Ext(push, "Push-сервис", "Уведомления в мобильное приложение")
+
+Rel(buyer, platform, "Ищет товары, оформляет и оплачивает заказ, следит за статусом", "HTTPS, мобильное приложение")
+Rel(ruralBuyer, smsUssd, "Оформляет заказ, получает статус", "USSD, SMS")
+Rel(seller, platform, "Размещает товары, подтверждает отгрузку, видит выплаты", "HTTPS")
+Rel(seller, whatsapp, "Отправляет товары и остатки без кабинета", "WhatsApp")
+Rel(operator, platform, "Модерирует каталог, проверяет продавцов, разбирает споры", "HTTPS")
+Rel(exec, platform, "Смотрит регистрации, заказы, выручку раз в минуту", "HTTPS")
+
+Rel(platform, mpesa, "Инициирует STK Push, получает статус оплаты", "REST, webhook")
+Rel(platform, flutterwave, "Принимает оплату картой и переводом, выплачивает продавцам", "REST, webhook")
+Rel(platform, paystack, "Переключает оплату при отказе Flutterwave в Нигерии", "REST, webhook")
+Rel(platform, sendbox, "Создаёт отправление, получает статус доставки", "REST, webhook")
+Rel(platform, sendy, "Создаёт отправление, получает статус доставки", "REST, webhook")
+Rel(whatsapp, platform, "Передаёт сообщения продавцов", "webhook")
+Rel(platform, whatsapp, "Отправляет статусы заказов", "REST")
+Rel(smsUssd, platform, "Передаёт USSD-сессии", "webhook")
+Rel(platform, smsUssd, "Отправляет SMS о заказе и оплате", "REST")
+Rel(platform, push, "Отправляет push-уведомления", "REST")
+Rel(push, buyer, "Доставляет уведомление", "push")
+@enduml
