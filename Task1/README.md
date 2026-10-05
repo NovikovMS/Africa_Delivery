@@ -8,3 +8,4 @@
 | [contradictions.md](contradictions.md) | Реестр противоречий, невозможные сочетания, что не является требованием |
 | [architecture-canvas.md](architecture-canvas.md) | Цели, драйверы, ограничения, риски, допущения |
 | [open-questions.md](open-questions.md) | Вопросы стейкхолдерам с дедлайнами и допущениями |
+| [investor-one-pager.md](investor-one-pager.md) | Одна страница инвестору по просьбе из А1: решение по нигерийским данным с альтернативами и вопросы к нему |
