@@ -1,0 +1,93 @@
+@startuml deployment-diagram
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Deployment.puml
+
+LAYOUT_TOP_DOWN()
+title Africa Delivery - Deployment (MVP, 15.10.2026, ADR-003)
+
+Deployment_Node(dns, "Route 53", "DNS, health checks") {
+  Container(dnsRec, "api.africadelivery, api-ng.africadelivery", "Failover-записи", "Основной адрес и резервный")
+}
+
+Deployment_Node(cf, "CloudFront", "Глобально, точки в Лагосе и Найроби") {
+  Container(cdn, "CDN", "Origin group", "Основной origin Кейптаун, резервный Йоханнесбург")
+}
+
+Deployment_Node(aws, "AWS af-south-1, Кейптаун", "Основной регион") {
+  Deployment_Node(vpc, "VPC", "Приватные подсети, NAT") {
+    Container(alb, "ALB", "Балансировщик", "Две зоны")
+    Deployment_Node(azA, "Зона af-south-1a", "") {
+      Container(coreA, "Ядро", "Fargate ARM, 1 vCPU / 2 ГБ", "2 задачи, автомасштабирование")
+      Container(piiKeA, "Сервис ПДн KE и ZA", "Fargate ARM, 0,25 vCPU", "1 задача")
+      ContainerDb(rdsPrimary, "RDS PostgreSQL primary", "db.t4g.large", "100 ГБ gp3")
+    }
+    Deployment_Node(azB, "Зона af-south-1b", "") {
+      Container(coreB, "Ядро", "Fargate ARM, 1 vCPU / 2 ГБ", "2 задачи")
+      ContainerDb(rdsStandby, "RDS PostgreSQL standby", "db.t4g.large", "Синхронная реплика")
+    }
+  }
+  Container(sqs, "SQS", "Региональный сервис", "")
+  ContainerDb(s3, "S3", "Региональный сервис", "Фото, файлы")
+  Container(kms, "KMS", "Региональный сервис", "Ключи ядра")
+}
+
+Deployment_Node(lagos, "Layer3, зона Лагос, Нигерия", "Хранилище ПДн NG") {
+  Deployment_Node(vmLagos, "ВМ 2 vCPU / 4 ГБ / 128 ГБ", "Ubuntu LTS, LUKS") {
+    Container(piiNg, "Сервис ПДн NG", "Go, systemd", "mTLS от ядра, JWT от приложения")
+    ContainerDb(pgLagos, "PostgreSQL primary", "PostgreSQL 16", "")
+    Container(baoLagos, "OpenBao", "Активный", "Мастер-ключи NG")
+    Container(probe, "Синтетическая проверка", "", "API из Нигерии раз в минуту")
+  }
+}
+
+Deployment_Node(abuja, "Layer3, зона Абуджа, Нигерия", "Резерв ПДн NG") {
+  Deployment_Node(vmAbuja, "ВМ 2 vCPU / 4 ГБ / 128 ГБ", "Ubuntu LTS, LUKS") {
+    Container(piiNgStandby, "Сервис ПДн NG", "Go, systemd", "Остановлен, запускается при переключении")
+    ContainerDb(pgAbuja, "PostgreSQL replica", "PostgreSQL 16", "Асинхронная, RPO <= 1 мин")
+    Container(baoAbuja, "OpenBao", "Запечатан", "Снимок из Лагоса раз в час")
+  }
+  ContainerDb(obj, "Объектное хранилище", "S3-совместимое", "pgBackRest: WAL + полный бэкап раз в сутки")
+}
+
+Deployment_Node(lineserve, "Lineserve, Лагос, Нигерия", "Второй провайдер") {
+  Deployment_Node(vmLineserve, "ВМ 2 vCPU / 4 ГБ", "Ubuntu LTS, LUKS") {
+    ContainerDb(repo2, "Репозиторий pgBackRest", "", "WAL + полный бэкап раз в сутки, снимок OpenBao")
+  }
+}
+
+Deployment_Node(gcp, "GCP africa-south1, Йоханнесбург", "Резерв ядра") {
+  Container(run, "Ядро", "Cloud Run, min 0", "Тот же образ, Pub/Sub вместо SQS")
+  ContainerDb(sql, "Cloud SQL PostgreSQL", "1 vCPU, без HA", "Логическая реплика")
+  ContainerDb(gcs, "GCS", "", "Копия S3 раз в сутки")
+}
+
+Deployment_Node(ci, "GitHub Actions + Terraform", "") {
+  Container(pipeline, "Пайплайн", "", "Один образ в ECR и Artifact Registry, один Terraform-модуль на площадку")
+}
+
+Rel(dnsRec, cdn, "api")
+Rel(dnsRec, piiNg, "api-ng, основной")
+Rel(dnsRec, piiNgStandby, "api-ng, при отказе Лагоса")
+Rel(cdn, alb, "Основной origin", "HTTPS")
+Rel(cdn, run, "Резервный origin", "HTTPS")
+Rel(alb, coreA, "")
+Rel(alb, coreB, "")
+Rel(alb, piiKeA, "/pii для KE и ZA")
+Rel(coreA, rdsPrimary, "SQL")
+Rel(coreB, rdsPrimary, "SQL")
+Rel(rdsPrimary, rdsStandby, "Синхронно")
+Rel(coreA, sqs, "")
+Rel(coreA, s3, "")
+Rel(coreA, piiNg, "Токен + шаблон", "mTLS")
+Rel(piiNg, pgLagos, "SQL")
+Rel(piiNg, baoLagos, "Ключи")
+Rel(pgLagos, pgAbuja, "Streaming")
+Rel(pgLagos, obj, "pgBackRest")
+Rel(pgLagos, repo2, "pgBackRest")
+Rel(baoLagos, baoAbuja, "Снимок раз в час")
+Rel(rdsPrimary, sql, "Database Migration Service")
+Rel(s3, gcs, "Раз в сутки")
+Rel(run, sql, "SQL")
+Rel(pipeline, coreA, "Деплой")
+Rel(pipeline, piiNg, "Деплой")
+Rel(pipeline, run, "Деплой")
+@enduml
