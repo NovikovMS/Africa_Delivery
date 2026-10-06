@@ -1,9 +1,13 @@
 # План отказоустойчивости и переключения
 
-**Версия:** 0.1
-**Дата:** 27.08.2026
-**Автор:** Solution Architect
-**Связано:** [ADR-003](adr-003-data-residency.md), [deployment-diagram.puml](deployment-diagram.puml), NFR-13, NFR-14, QAS-01, QAS-05 ([Task3](../Task3/README.md)), F-06 ([FMEA](../Task3/fmea.md))
+**Версия:** 0.1  
+**Дата:** 27.08.2026  
+**Автор:** Solution Architect  
+**Связано:** 
+- [ADR-003](adr-003-data-residency.md), 
+- [deployment-diagram.puml](deployment-diagram.puml), 
+- NFR-13, NFR-14, QAS-01, QAS-05 ([Task3](../Task3/README.md)), 
+- F-06 ([FMEA](../Task3/fmea.md))
 
 ---
 
