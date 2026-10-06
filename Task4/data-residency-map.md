@@ -1,9 +1,13 @@
 # Data Residency Map
 
-**Версия:** 0.1
-**Дата:** 27.08.2026
-**Автор:** Solution Architect
-**Связано:** [ADR-003](adr-003-data-residency.md), [сравнение регионов](cloud-regions-comparison.md), C-05, C-06, C-07, Q-2 и Q-4 ([open-questions.md](../Task1/open-questions.md)), NFR-17 ([реестр НФТ](../Task3/nfr-registry.md))
+**Версия:** 0.1  
+**Дата:** 27.08.2026  
+**Автор:** Solution Architect  
+**Связано:** 
+- [ADR-003](adr-003-data-residency.md), 
+- [сравнение регионов](cloud-regions-comparison.md), 
+- C-05, C-06, C-07, Q-2 и Q-4 ([open-questions.md](../Task1/open-questions.md)), 
+- NFR-17 ([реестр НФТ](../Task3/nfr-registry.md))  
 
 Карта действует до заключения юриста (А3, ожидается 05.09-19.09). Где точных требований нет, принята самая строгая трактовка.
 

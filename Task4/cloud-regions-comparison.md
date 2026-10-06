@@ -1,9 +1,12 @@
 # Сравнение облачных регионов
 
-**Версия:** 0.1
-**Дата:** 27.08.2026
-**Автор:** Solution Architect
-**Связано:** [ADR-003](adr-003-data-residency.md), [цены облака](../Task2/cloud-prices.md), C-02, C-05, NFR-14
+**Версия:** 0.1  
+**Дата:** 27.08.2026  
+**Автор:** Solution Architect  
+**Связано:** 
+- [ADR-003](adr-003-data-residency.md), 
+- [цены облака](../Task2/cloud-prices.md), 
+- C-02, C-05, NFR-14
 
 Цены on-demand, месяц = 730 ч. Цены AWS, Azure и Layer3 - из [cloud-prices.md](../Task2/cloud-prices.md).
 

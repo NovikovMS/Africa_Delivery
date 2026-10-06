@@ -1,10 +1,16 @@
 # ADR-003: Стратегия размещения данных
 
-**Статус:** Предложено
-**Версия:** 0.1
-**Дата:** 27.08.2026
-**Решают:** Solution Architect (автор), CTO Р. Менон, юрист А. Нвосу, DPO
-**Связано:** [ADR-001](../Task2/adr-001-architecture-style.md), [ADR-002](../Task3/adr-002-caching-strategy.md), [Data Residency Map](data-residency-map.md), [сравнение регионов](cloud-regions-comparison.md), [план переключения](failover-plan.md), C-05, C-06, C-07, Q-2, Q-4, NFR-14, NFR-17, F-06
+**Статус:** Предложено  
+**Версия:** 0.1  
+**Дата:** 27.08.2026  
+**Решают:** Solution Architect (автор), CTO Р. Менон, юрист А. Нвосу, DPO  
+**Связано:** 
+- [ADR-001](../Task2/adr-001-architecture-style.md), 
+- [ADR-002](../Task3/adr-002-caching-strategy.md), 
+- [Data Residency Map](data-residency-map.md), 
+- [сравнение регионов](cloud-regions-comparison.md), 
+- [план переключения](failover-plan.md), 
+- C-05, C-06, C-07, Q-2, Q-4, NFR-14, NFR-17, F-06
 
 Пересматривает допущение из [cloud-prices.md](../Task2/cloud-prices.md): «второй регион для DR - ближайший регион того же провайдера». Причина: ближайший второй регион AWS находится за пределами Африки.
 
