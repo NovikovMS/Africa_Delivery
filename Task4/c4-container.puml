@@ -1,0 +1,91 @@
+@startuml c4-container
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+LAYOUT_TOP_DOWN()
+title Africa Delivery - C4 Container по регионам (MVP, 15.10.2026, ADR-003)
+
+Person(buyerNg, "Покупатель, Нигерия", "Android, 3G/4G, USSD")
+Person(buyerKe, "Покупатель, Кения", "Android, 3G/4G, USSD")
+Person(seller, "Продавец", "Веб-кабинет или WhatsApp")
+Person(operator, "Оператор бэк-офиса", "Модерация, KYC, споры")
+
+Container(app, "Мобильное приложение", "Android", "Каталог с офлайн-кешем, заказ, оплата через форму партнёра")
+Container(cabinet, "Веб-кабинет продавца и бэк-офис", "SPA", "Товары, остатки, выплаты. Маскированные ПДн")
+
+Boundary(edge, "CloudFront, точки присутствия в Лагосе и Найроби") {
+  Container(cdn, "CDN", "CloudFront", "Каталог, фото, статика. Маршрут API по стране. Без ПДн")
+}
+
+Boundary(aws, "AWS af-south-1, Кейптаун, ЮАР. Основной регион") {
+  Container(core, "Ядро", "Go, Fargate, 2 зоны", "Модульный монолит: каталог, заказы, платежи, доставка, уведомления. Работает с токенами")
+  Container(piiKe, "Сервис ПДн KE и ZA", "Go, Fargate", "Токенизация, профили, согласия для Кении и ЮАР")
+  ContainerDb(coreDb, "БД ядра", "RDS PostgreSQL Multi-AZ", "Заказы, каталог, платежи. Токен вместо покупателя. Отдельная схема ПДн KE")
+  ContainerQueue(queue, "Очередь", "SQS", "Отправления, уведомления, вебхуки с повтором")
+  ContainerDb(s3, "Файлы", "S3", "Фото товаров, KYC продавцов Кении")
+}
+
+Boundary(ngLagos, "Layer3 Лагос, Нигерия. ПДн нигерийцев") {
+  Container(piiNg, "Сервис ПДн NG", "Go, ВМ", "Токенизация, профили, адреса, согласия. Сам передаёт адрес курьеру и номер в SMS")
+  ContainerDb(piiNgDb, "БД ПДн NG", "PostgreSQL", "Поля зашифрованы AES-256-GCM")
+  Container(bao, "OpenBao", "ВМ", "Мастер-ключи ПДн Нигерии")
+}
+
+Boundary(ngAbuja, "Layer3 Абуджа, Нигерия. Резерв ПДн") {
+  ContainerDb(piiNgReplica, "Реплика БД ПДн NG", "PostgreSQL", "Потоковая репликация, RPO <= 1 мин")
+  ContainerDb(piiNgBackup, "Бэкапы ПДн NG", "Объектное хранилище Layer3", "pgBackRest, шифрование ключом из Лагоса")
+}
+
+Boundary(gcp, "GCP africa-south1, Йоханнесбург, ЮАР. Резерв ядра") {
+  Container(coreDr, "Ядро, резерв", "Go, Cloud Run, 0 инстансов в простое", "Тот же образ. Поднимается при отказе Кейптауна")
+  ContainerDb(coreDbDr, "Реплика БД ядра", "Cloud SQL PostgreSQL", "Логическая репликация, RPO <= 5 мин")
+}
+
+Boundary(ngLineserve, "Lineserve Лагос, Нигерия. Второй провайдер") {
+  ContainerDb(piiNgBackup2, "Копия бэкапов ПДн NG", "ВМ, pgBackRest", "Второй репозиторий, RPO <= 5 мин")
+}
+
+System_Ext(psp, "Flutterwave, Paystack, M-Pesa", "Платёжные данные хранятся у партнёра")
+System_Ext(sendbox, "Sendbox", "Доставка, Нигерия")
+System_Ext(sendy, "Sendy", "Доставка, Кения")
+System_Ext(smsNg, "SMS/USSD-агрегатор, Нигерия", "")
+System_Ext(smsKe, "SMS/USSD-шлюз, Кения", "")
+System_Ext(meta, "WhatsApp, Firebase", "За пределами Африки. Без ПДн Нигерии в push")
+System_Ext(grafana, "Grafana Cloud", "Телеметрия без ПДн")
+
+Rel(buyerNg, app, "Пользуется")
+Rel(buyerKe, app, "Пользуется")
+Rel(seller, cabinet, "Пользуется")
+Rel(operator, cabinet, "Пользуется")
+
+Rel(app, cdn, "Каталог, заказы", "HTTPS")
+Rel(cabinet, cdn, "Кабинет, бэк-офис", "HTTPS")
+Rel(cdn, core, "API", "HTTPS")
+Rel(app, piiNg, "Свой профиль и адрес, только NG", "HTTPS, JWT")
+Rel(cdn, piiKe, "Свой профиль, KE и ZA", "HTTPS, JWT")
+
+Rel(core, coreDb, "Читает и пишет", "SQL")
+Rel(core, queue, "Задачи в фон", "SQS")
+Rel(core, s3, "Фото, файлы", "HTTPS")
+Rel(core, piiKe, "Токены KE и ZA", "gRPC")
+Rel(piiKe, coreDb, "Схема ПДн KE", "SQL")
+Rel(core, piiNg, "Токен + шаблон: отправить SMS, передать адрес курьеру", "mTLS, в фоне")
+
+Rel(piiNg, piiNgDb, "Читает и пишет", "SQL")
+Rel(piiNg, bao, "Расшифровка ключей данных", "HTTPS")
+Rel(piiNgDb, piiNgReplica, "Реплицирует", "PostgreSQL streaming")
+Rel(piiNgDb, piiNgBackup, "WAL и бэкапы", "pgBackRest")
+Rel(piiNgDb, piiNgBackup2, "WAL и бэкапы", "pgBackRest")
+
+Rel(coreDb, coreDbDr, "Реплицирует", "Database Migration Service")
+Rel(coreDr, coreDbDr, "При отказе Кейптауна", "SQL")
+
+Rel(core, psp, "Платёж, выплата, статус", "REST, webhook")
+Rel(piiNg, sendbox, "Адрес и телефон получателя", "REST")
+Rel(piiNg, smsNg, "SMS с номером", "REST")
+Rel(core, sendy, "Отправление KE", "REST")
+Rel(core, smsKe, "SMS KE", "REST")
+Rel(core, meta, "Push, WhatsApp KE", "REST")
+Rel(piiNg, meta, "WhatsApp NG по выбору пользователя", "REST")
+Rel(core, grafana, "Метрики, логи без ПДн, трейсы", "OTLP")
+Rel(piiNg, grafana, "Только метрики", "OTLP")
+@enduml

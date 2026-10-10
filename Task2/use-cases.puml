@@ -1,0 +1,55 @@
+@startuml use-cases
+left to right direction
+skinparam packageStyle rectangle
+skinparam actorStyle awesome
+title Africa Delivery - ключевые сценарии MVP
+
+actor "Покупатель" as Buyer
+actor "Покупатель без интернета" as Rural
+actor "Продавец" as Seller
+actor "Оператор бэк-офиса" as Operator
+actor "Руководство" as Exec
+
+actor "Платёжный провайдер\nM-Pesa, Flutterwave" as Pay <<external>>
+actor "Логистический партнёр\nSendbox, Sendy" as Logistics <<external>>
+actor "Шлюз уведомлений\nSMS, WhatsApp, push" as Notify <<external>>
+
+rectangle "Africa Delivery MVP" {
+  usecase "Зарегистрироваться\nс согласием на обработку ПДн" as UC1
+  usecase "Найти товар в каталоге" as UC2
+  usecase "Оформить заказ" as UC3
+  usecase "Оплатить заказ" as UC4
+  usecase "Отследить статус заказа" as UC5
+  usecase "Получить уведомление" as UC6
+  usecase "Оформить заказ через USSD" as UC7
+  usecase "Разместить товар" as UC8
+  usecase "Разместить товар через WhatsApp" as UC8w
+  usecase "Подтвердить отгрузку" as UC9
+  usecase "Получить выплату" as UC10
+  usecase "Модерировать каталог и KYC продавца" as UC11
+  usecase "Смотреть дашборд запуска" as UC12
+}
+
+Buyer --> UC1
+Buyer --> UC2
+Buyer --> UC3
+Buyer --> UC5
+Rural --> UC7
+Seller --> UC8
+Seller --> UC9
+Seller --> UC10
+Operator --> UC11
+Exec --> UC12
+
+UC3 ..> UC4 : <<include>>
+UC7 ..> UC4 : <<include>>
+UC3 ..> UC6 : <<include>>
+UC8w ..> UC8 : <<extend>>
+UC8 ..> UC11 : <<include>>
+
+UC4 --> Pay
+UC10 --> Pay
+UC9 --> Logistics
+UC5 --> Logistics
+UC6 --> Notify
+@enduml

@@ -1,0 +1,45 @@
+flowchart LR
+    subgraph clients["Клиенты"]
+        app["Мобильное приложение<br/>RUM: время до первого товара"]
+        crash["Firebase Crashlytics<br/>краши"]
+    end
+
+    subgraph cloud["Облачный регион"]
+        cdn["CDN<br/>логи запросов"]
+        subgraph task["Контейнер приложения"]
+            mono["Go-монолит<br/>OpenTelemetry SDK<br/>метрики, логи, трейсы"]
+            col["OTel Collector<br/>tail sampling, маскирование"]
+        end
+        db["Managed PostgreSQL<br/>метрики провайдера"]
+    end
+
+    subgraph ng["Лагос, Layer3"]
+        pii["Хранилище ПДн<br/>node exporter"]
+        probe["Синтетическая проверка<br/>из Нигерии"]
+    end
+
+    subgraph grafana["Grafana Cloud"]
+        mimir["Метрики<br/>Prometheus / Mimir"]
+        loki["Логи<br/>Loki"]
+        tempo["Трейсы<br/>Tempo"]
+        dash["Дашборды и SLO"]
+        alert["Алерты по burn rate"]
+    end
+
+    oncall["Дежурный<br/>звонок, SMS"]
+
+    app -- "краши" --> crash
+    app -- "OTLP" --> col
+    mono -- "OTLP" --> col
+    cdn -- "логи" --> loki
+    col -- "метрики" --> mimir
+    col -- "логи без ПДн" --> loki
+    col -- "трейсы" --> tempo
+    db -- "метрики" --> mimir
+    pii -- "только метрики" --> col
+    probe -- "доступность API" --> mimir
+    mimir --> dash
+    loki --> dash
+    tempo --> dash
+    mimir --> alert
+    alert --> oncall
