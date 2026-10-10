@@ -79,7 +79,7 @@
 
 ## 4. План
 
-Исходник: [roadmap-gantt.mmd](roadmap.mmd)
+Исходник: [roadmap.mmd](roadmap.mmd)
 
 ![Roadmap Gantt](roadmap.png)
 

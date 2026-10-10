@@ -1,6 +1,6 @@
 #### Шаблон 1. ТСО модель проект
 
-[Модель TCO](TCO_model_Africa_Delivery_template.xlsx)
+[Модель TCO](tco-model-africa-delivery-template.xlsx)
 Вы можете заполнить шаблон за 20-30 минут. Заполните только жёлтые ячейки:
 
 - На листе «Допущения» драйверы бизнеса по годам: пользователи, заказы, средний чек, GMV (Gross Merchandize Value)
@@ -28,7 +28,7 @@
 - Разовые статьи (комплаенс-аудит, миграция) модель по умолчанию тянет во все пять лет — в инструкции написано, что лишние годы нужно перезаписать нулём вручную. Это осознанный компромисс ради простоты.
 
 Шаблон 2. Failure Mode and Effects Analysis (FMEA)
-[Шаблон](Failure_Mode_and_Effects_Analysi.md)
+[Шаблон](failure-mode-and-effects-analysis.md)
 
 Шаблон 3. Data Residency Map
-[Шаблон](Data_Residency_Map.md)
+[Шаблон](data-residency-map.md)
