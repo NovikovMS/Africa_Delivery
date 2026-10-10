@@ -1,8 +1,13 @@
 # Стратегия наблюдаемости
 
-**Версия:** 1.0
-**Дата:** 25.08.2026
-**Связано:** [реестр НФТ](nfr-registry.md), SLO [catalog](slo/catalog.md), [payments](slo/payments.md), [notifications](slo/notifications.md), [FMEA](fmea.md)
+**Версия:** 1.0  
+**Дата:** 25.08.2026  
+**Связано:** 
+- [реестр НФТ](nfr-registry.md)
+- SLO [catalog](slo/catalog.md)
+- [payments](slo/payments.md)
+- [notifications](slo/notifications.md)
+- [FMEA](fmea.md)
 
 ---
 

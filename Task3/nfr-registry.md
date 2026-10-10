@@ -1,9 +1,12 @@
 # Реестр нефункциональных требований
 
-**Версия:** 1.0
-**Дата:** 25.08.2026
-**Автор:** Solution Architect
-**Связано:** [ADR-001](../Task2/adr-001-architecture-style.md), [Architecture Vision](../Task2/architecture-vision.md), [реестр противоречий](../Task1/contradictions.md)
+**Версия:** 1.0  
+**Дата:** 25.08.2026  
+**Автор:** Solution Architect  
+**Связано:**
+- [ADR-001](../Task2/adr-001-architecture-style.md)
+- [Architecture Vision](../Task2/architecture-vision.md)
+- [реестр противоречий](../Task1/contradictions.md)
 
 Значения для Год 1, если не указано иное.  
 Платформа - модульный монолит (ADR-001).  
