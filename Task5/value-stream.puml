@@ -1,0 +1,88 @@
+@startuml value-stream
+title Africa Delivery - Value Stream «Покупка» и capability на этапах (MVP)
+
+skinparam defaultFontSize 12
+skinparam rectangle {
+  RoundCorner 8
+}
+
+legend bottom right
+  |<#C8E6C9> Build |
+  |<#BBDEFB> Buy |
+  |<#FFE0B2> Partner |
+  |<#EEEEEE> После MVP |
+endlegend
+
+rectangle "1. Подключить\nпродавца" as s1 {
+  rectangle "5.1 Онбординг и KYC" as c51 #C8E6C9
+  rectangle "5.2 Товары и остатки" as c52 #C8E6C9
+  rectangle "1.4 Модерация" as c14 #C8E6C9
+}
+
+rectangle "2. Найти товар" as s2 {
+  rectangle "1.1 Карточки\nи категории" as c11 #C8E6C9
+  rectangle "1.2 Поиск" as c12 #C8E6C9
+  rectangle "1.3 Фото и медиа" as c13 #BBDEFB
+  rectangle "2.3 Промо и\nфлеш-распродажи" as c23 #C8E6C9
+}
+
+rectangle "3. Заказать и оплатить\n~1,9% GMV, ADR-004" as s3 {
+  rectangle "6.1 Аккаунт" as c61 #C8E6C9
+  rectangle "2.1 Заказ" as c21 #C8E6C9
+  rectangle "2.2 Резервирование\nостатков" as c22 #C8E6C9
+  rectangle "2.4 Заказ без\nинтернета" as c24 #FFE0B2
+  rectangle "3.1 Приём оплаты" as c31 #FFE0B2
+  rectangle "3.2 Маршрутизация" as c32 #C8E6C9
+}
+
+rectangle "4. Доставить" as s4 {
+  rectangle "4.1 Отправления" as c41 #FFE0B2
+  rectangle "4.2 Отслеживание" as c42 #FFE0B2
+  rectangle "6.2 Уведомления" as c62 #FFE0B2
+  rectangle "4.3 ПВЗ и наличные" as c43 #EEEEEE
+}
+
+rectangle "5. Получить\nили вернуть" as s5 {
+  rectangle "4.4 Возврат товара" as c44 #FFE0B2
+  rectangle "6.4 Поддержка\nи споры" as c64 #C8E6C9
+}
+
+rectangle "6. Рассчитаться\nс продавцом\nKE T+0, NG T+1" as s6 {
+  rectangle "3.3 Выплаты\nпродавцам" as c33 #FFE0B2
+  rectangle "3.4 Сверка" as c34 #C8E6C9
+  rectangle "5.3 Аналитика\nпродавца" as c53 #EEEEEE
+}
+
+c51 -[hidden]down- c52
+c52 -[hidden]down- c14
+c11 -[hidden]down- c12
+c12 -[hidden]down- c13
+c13 -[hidden]down- c23
+c61 -[hidden]down- c21
+c21 -[hidden]down- c22
+c22 -[hidden]down- c24
+c24 -[hidden]down- c31
+c31 -[hidden]down- c32
+c41 -[hidden]down- c42
+c42 -[hidden]down- c62
+c62 -[hidden]down- c43
+c44 -[hidden]down- c64
+c33 -[hidden]down- c34
+c34 -[hidden]down- c53
+
+s1 -right-> s2
+s2 -right-> s3
+s3 -right-> s4
+s4 -right-> s5
+s5 -right-> s6
+
+rectangle "На всех этапах" as base {
+  rectangle "7.1 ПДн по\nюрисдикциям" as c71 #C8E6C9
+  rectangle "7.2 Антифрод" as c72 #BBDEFB
+  rectangle "7.3 Дашборд" as c73 #C8E6C9
+  rectangle "6.3 Маркетинг\nс согласием" as c63 #C8E6C9
+  rectangle "8.x Платформа" as c8 #BBDEFB
+}
+
+c14 -[hidden]down- base
+@enduml
