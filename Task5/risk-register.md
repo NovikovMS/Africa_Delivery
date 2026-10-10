@@ -1,9 +1,13 @@
 # Risk Register
 
-**Версия:** 0.1
-**Дата:** 31.08.2026
-**Автор:** Solution Architect
-**Связано:** [roadmap](roadmap.md), [ADR-003](../Task4/adr-003-data-residency.md), [ADR-004](adr-004-payment-provider.md), [FMEA](../Task3/fmea.md)
+**Версия:** 0.1  
+**Дата:** 31.08.2026  
+**Автор:** Solution Architect  
+**Связано:** 
+- [roadmap](roadmap.md)
+- [ADR-003](../Task4/adr-003-data-residency.md)
+- [ADR-004](adr-004-payment-provider.md)
+- [FMEA](../Task3/fmea.md)
 
 Технические отказы - в [FMEA](../Task3/fmea.md). Здесь риски проекта и решений задания 5.
 
